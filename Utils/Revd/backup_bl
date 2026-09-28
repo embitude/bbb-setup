@@ -1,0 +1,33 @@
+#!/bin/bash
+
+BKUP_DIR=/opt/Embitude
+
+if [ -f ${BKUP_DIR}/MLO ] && [ -f ${BKUP_DIR}/u-boot.img ]
+then
+	echo "Backup already done."
+	exit 0
+fi
+
+UBOOT=u-boot.img
+
+if (mountpoint -q /boot/uboot)
+then
+	cd /boot/uboot
+elif [ -f /opt/backup/uboot ]
+then
+	cd /opt/backup/uboot
+else
+	cd /opt/u-boot/bb-u-boot-am335x-evm
+	UBOOT="u-boot.img u-boot-dtb.img"
+fi
+
+mkdir -p ${BKUP_DIR}
+
+if (cp -a MLO ${UBOOT} ${BKUP_DIR} 2> /dev/null)
+then
+	sync
+	echo "Backup successful."
+else
+	echo "Backup failed."
+	exit 1
+fi
